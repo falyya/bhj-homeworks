@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const dropdownValue = dropdown.querySelector(".dropdown__value");
         const dropdownList = dropdown.querySelector(".dropdown__list");
 
-        dropdownValue.addEventListener('mouseover', function() {
+        dropdownValue.addEventListener('click', function() {
             dropdownList.classList.toggle('dropdown__list_active');
         });
         
