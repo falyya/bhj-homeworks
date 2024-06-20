@@ -1,37 +1,16 @@
-let tooltipElem;
+document.addEventListener('DOMContentLoaded', () => {
+    const tooltips = Array.from(document.querySelectorAll('.has-tooltip'));
 
-document.addEventListener('click', function(event) {
-    event.preventDefault();
-    let target = event.target;
-
-    let tooltipText = target.getAttribute('title');
-    if (!tooltipText) return;
-
-    tooltipElem = document.createElement("div");
-    tooltipElem.className = 'tooltip';
-    tooltipElem.innerHTML = tooltipText;
-    tooltipElem.classList.add('tooltip_active');
-    document.body.append(tooltipElem);
-
-    let coords = target.getBoundingClientRect();
-
-    let left = coords.left + (target.offsetWidth - tooltipElem.offsetWidth) / 2;
-    if (left <  0) left = 0;
-    
-    let top = coords.top - tooltipElem.offsetHeight - 5;
-    if (top < 0) {
-        top = coords.top + target.offsetHeight + 5;
-    }
-
-    tooltipElem.style.left = left + 'px';
-    tooltipElem.style.top = top + 'px';
+    tooltips.forEach((tooltip) => {
+        let tooltipItem = null;
+        tooltip.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!tooltipItem) {
+                const position = tooltip.getBoundingClientRect();
+                tooltip.insertAdjacentHTML('afterend', `<div class="tooltip" style="left: ${parseInt(position.left)}px;">${tooltip.getAttribute('title')}</div>`);
+                tooltipItem = tooltip.nextElementSibling;
+            }
+            tooltipItem.classList.toggle('tooltip_active');
+        });
+    });
 });
-
-document.onmouseout = function(e) {
-    if (tooltipElem) {
-        tooltipElem.remove();
-        tooltipElem = null;
-    }
-}
-
-
