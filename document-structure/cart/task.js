@@ -1,52 +1,43 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const productCards = document.querySelectorAll('.product');
-    const cart = document.querySelector('.cart');
-    const cartTitle = document.querySelector('.cart__title');
-  
-    productCards.forEach(product => {
-      const addButton = product.querySelector('.product__quantity-control_inc');
-      const removeButton = product.querySelector('.product__quantity-control_dec');
-      const quantityValue = product.querySelector('.product__quantity-value');
-      const addToCartButton = product.querySelector('.product__add');
-  
-      addButton.addEventListener('click', function() {
-        let newValue = parseInt(quantityValue.textContent) + 1;
-        quantityValue.textContent = newValue > 0 ? newValue : 1;
-      });
-  
-      removeButton.addEventListener('click', function() {
-        let newValue = parseInt(quantityValue.textContent) - 1;
-        quantityValue.textContent = newValue > 0 ? newValue : 1;
-      });
-  
-      addToCartButton.addEventListener('click', function() {
-        const productId = product.getAttribute('data-id');
-        const productImageSrc = product.querySelector('.product__image').getAttribute('src');
-        const productQuantity = parseInt(quantityValue.textContent);
-  
-        const existingCartItem = cart.querySelector(`.cart__product[data-id="${productId}"]`);
-        if (existingCartItem) {
-          const existingQuantity = parseInt(existingCartItem.querySelector('.cart__product-count').textContent);
-          existingCartItem.querySelector('.cart__product-count').textContent = existingQuantity + productQuantity;
-        } else {
-          const cartProduct = document.createElement('div');
-          cartProduct.classList.add('cart__product');
-          cartProduct.setAttribute('data-id', productId);
-  
-          const cartProductImage = document.createElement('img');
-          cartProductImage.classList.add('cart__product-image');
-          cartProductImage.setAttribute('src', productImageSrc);
-          cartProduct.appendChild(cartProductImage);
-  
-          const cartProductCount = document.createElement('div');
-          cartProductCount.classList.add('cart__product-count');
-          cartProductCount.textContent = productQuantity;
-          cartProduct.appendChild(cartProductCount);
-          cart.appendChild(cartProduct);
-        }
-  
-        cartTitle.style.display = 'block'; 
-      });
+const productsList = document.querySelectorAll(".product");
+const cart = document.querySelector(".cart__products");
+
+for (let productElement of productsList) {
+    const decBtn = productElement.querySelector(".product__quantity-control_dec");
+    const incBtn = productElement.querySelector(".product__quantity-control_inc");
+    const quantityValue = productElement.querySelector(".product__quantity-value");
+    const productAdd = productElement.querySelector(".product__add");
+    const productImage = productElement.querySelector(".product__image");
+
+    decBtn.addEventListener("click", () => {
+        if (+quantityValue.textContent <= 1) return;
+        quantityValue.textContent = +quantityValue.textContent - 1;
     });
-  });
-  
+
+    incBtn.addEventListener("click", () => {
+        quantityValue.textContent = +quantityValue.textContent + 1;
+    });
+
+    productAdd.addEventListener("click", () => {
+        const foundProduct = [...cart.children].find((prod) => productElement.dataset.id === prod.dataset.id);
+        if (foundProduct) {
+            const productCount = foundProduct.querySelector(".cart__product-count");
+            productCount.textContent = +productCount.textContent + +quantityValue.textContent;
+        }
+        else {
+            const newProduct = createProductElement(productElement.dataset.id, +quantityValue.textContent, productImage.src);
+            cart.appendChild(newProduct);
+        }
+    });
+}
+
+function createProductElement(id, count, imageLink) {
+    let templateHTML = `
+    <div class="cart__product" data-id="${id}">
+        <img class="cart__product-image" src="${imageLink}">
+        <div class="cart__product-count">${count}</div>
+    </div>`;
+    templateHTML = templateHTML.trim();
+    const template = document.createElement("template");
+    template.innerHTML = templateHTML;
+    return template.content.firstChild;
+}
